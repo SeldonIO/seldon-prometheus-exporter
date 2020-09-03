@@ -23,5 +23,16 @@ func TestContainerUsageAgainstPrometheus(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	fmt.Printf("%+v\n", resp)
+	data := resp.(map[string]interface{})["data"]
+	result := data.(map[string]interface{})["result"]
+	firstResult := result.([]interface{})[0]
+	metric := firstResult.(map[string]interface{})["metric"]
+	value := firstResult.(map[string]interface{})["value"]
+
+	model := metric.(map[string]interface{})["label_seldon_app"]
+	namespace := metric.(map[string]interface{})["namespace"]
+	metricVal := value.([]interface{})[0]
+	fmt.Println(model)
+	fmt.Println(namespace)
+	fmt.Println(metricVal)
 }

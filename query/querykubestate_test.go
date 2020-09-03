@@ -37,4 +37,12 @@ func TestContainerUsageAgainstPrometheus(t *testing.T) {
 		fmt.Println(metricVal)
 	}
 
+	//TODO: need to register metrics and create entries for different labels
+	// above is a metric for containers and each iteration of loop is a different set of labels
+	// see https://github.com/SeldonIO/seldon-deploy/issues/1294#issuecomment-675010586
+	// example from https://github.com/prometheus/client_golang/issues/364 may be good reference
+	// or https://github.com/SeldonIO/seldon-core/blob/3b92c880cd115af386e3cb5e1152adec4c1f65cb/executor/api/metric/client.go#L15
+	// should we respond to scrapes... which could be problematic as the prom client library provides the handler?
+	// or just have a cycle process on the same frequence as the scrape interval that updates the metrics
+	// could alternatively implement endpont that returns data in prom format without using prom client.. but that feels awkward
 }

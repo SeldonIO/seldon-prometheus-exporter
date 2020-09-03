@@ -2,7 +2,13 @@ package query
 
 import (
 	"bytes"
+	"crypto/tls"
+	"encoding/json"
 	"log"
+	"net/http"
+	"net/url"
+	"os"
+	"strings"
 	"text/template"
 )
 type QueryInputData struct {
@@ -41,4 +47,59 @@ func BuildQueryFromTemplate(inputData QueryInputData, templateStr string) (query
 	}
 
 	return result, nil
+}
+
+func QueryPrometheus(query string) (interface{}, error){
+	params := url.Values{}
+	params.Add("query", query)
+
+	promUrl := os.Getenv("PROMETHEUS_URL")
+	if promUrl == "" {
+		promUrl = "http://localhost:8080/api/v1/"
+	}
+	queryType := "query" //not doing range
+	promUrl = promUrl + queryType
+	baseURL, err := url.Parse(promUrl)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	baseURL.RawQuery = params.Encode()
+	queryObj := strings.NewReader(params.Encode())
+
+	req, err := http.NewRequest("GET", baseURL.String(), queryObj)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	promToken := os.Getenv("PROMETHEUS_SELDON_TOKEN")
+
+	if promToken != "" {
+		req.Header.Add("Authorization", "Bearer "+promToken)
+	}
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+		Transport: tr,
+	}
+
+	resp, err := client.Do(req)
+	//log.Println("QUERY AGAINST " + baseURL.String() + " of " + inputData.QueryTemplate)
+	//log.Println(query)
+	//log.Println(params.Encode())
+	//log.Println(resp)
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	var queryData interface{}
+	json.NewDecoder(resp.Body).Decode(&queryData)
+	return queryData, nil
 }

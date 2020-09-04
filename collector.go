@@ -2,6 +2,9 @@ package main
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/seldonIO/seldon-prometheus-exporter/query"
+	"log"
+	"time"
 )
 
 //Define the metrics we wish to expose
@@ -29,18 +32,34 @@ var modelContainersMetric = prometheus.NewGaugeVec(
 	[]string{"namespace","type","name"},
 )
 
+//TODO: add req and lim
+
 func init() {
 	//Register metrics with prometheus
 	prometheus.MustRegister(modelCpuUsageMetric)
 	prometheus.MustRegister(modelMemoryUsageMetric)
 	prometheus.MustRegister(modelContainersMetric)
 
-	modelCpuUsageMetric.WithLabelValues("seldon-ns","SeldonDeployment","iris").Set(0.019797927555476498)
+	// periodically collect metrics
+	go func() {
+		for {
+			collectMetricsUsingQueryTemplate(modelCpuUsageMetric,query.CpuUsageSumSeldonTemplate)
+			collectMetricsUsingQueryTemplate(modelMemoryUsageMetric,query.MemUsageSumSeldonTemplate)
+			collectMetricsUsingQueryTemplate(modelContainersMetric,query.ContainersUsageSumSeldonTemplate)
 
-	modelMemoryUsageMetric.WithLabelValues("seldon-ns","SeldonDeployment","iris").Set(138986.313)
+			//FIXME: should set this and the Range from an env var, will have to parse string in prom format
+			time.Sleep(time.Duration(2 * time.Minute))
+		}
+	}()
+}
 
-	modelContainersMetric.WithLabelValues("seldon-ns","SeldonDeployment","iris").Set(2.1)
-
-	//TODO: need to set metrics periodically
-	//and reset on each iteraction with modelContainersMetric.Reset()
+func collectMetricsUsingQueryTemplate(metric *prometheus.GaugeVec, queryTemplate string) {
+	queryReturnValues, err := query.ObtainMetricValues(queryTemplate, query.DefaultInputData)
+	if err != nil {
+		log.Println(err)
+	}
+	metric.Reset()
+	for _, v := range queryReturnValues {
+		metric.WithLabelValues(v.Namespace, v.ModelType, v.Model).Set(v.Value)
+	}
 }

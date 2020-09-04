@@ -4,16 +4,26 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"text/template"
 )
+
 type QueryInputData struct {
 	Range string `json:",omitempty"`
 	OffsetExp string `json:",omitempty"`
+}
+
+type MetricInstance struct {
+	Model string
+	Namespace string
+	ModelType string
+	Value float64
 }
 
 var DefaultInputData = 	QueryInputData{
@@ -47,6 +57,49 @@ func BuildQueryFromTemplate(inputData QueryInputData, templateStr string) (query
 	}
 
 	return result, nil
+}
+
+func ObtainMetricValues(queryTemplate string, inputData QueryInputData) ([]MetricInstance, error){
+	query, err := BuildQueryFromTemplate(inputData, queryTemplate)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	resp, err := QueryPrometheus(query)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	fmt.Println(query)
+
+	data := resp.(map[string]interface{})["data"]
+	result := data.(map[string]interface{})["result"]
+
+	var metricInstances []MetricInstance
+
+	for _, res := range result.([]interface{}) {
+		metric := res.(map[string]interface{})["metric"]
+		value := res.(map[string]interface{})["value"]
+
+		model := metric.(map[string]interface{})["label_seldon_app"]
+		namespace := metric.(map[string]interface{})["namespace"]
+		metricVal := value.([]interface{})[1]
+
+		f, err := strconv.ParseFloat(metricVal.(string),64)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+
+		//TODO: "SeldonDeployment" is hardcoded
+		metricInstances = append(metricInstances, MetricInstance{Model: model.(string),Namespace: namespace.(string),ModelType: "SeldonDeployment",Value: f})
+		fmt.Println(model)
+		fmt.Println(namespace)
+		fmt.Println(metricVal)
+	}
+	return metricInstances, nil
 }
 
 func QueryPrometheus(query string) (interface{}, error){

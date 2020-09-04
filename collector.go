@@ -5,20 +5,42 @@ import (
 )
 
 //Define the metrics we wish to expose
-var fooMetric = prometheus.NewGauge(prometheus.GaugeOpts{
-	Name: "foo_metric", Help: "Shows whether a foo has occurred in our cluster"})
+var modelCpuUsageMetric = prometheus.NewGaugeVec(
+	prometheus.GaugeOpts{
+		Name: "model_cpu_usage_seconds_total",
+		Help: "cpu usage for an ML deployment",
+	},
+	[]string{"namespace","type","name"},
+)
 
-var barMetric = prometheus.NewGauge(prometheus.GaugeOpts{
-	Name: "bar_metric", Help: "Shows whether a bar has occurred in our cluster"})
+var modelMemoryUsageMetric = prometheus.NewGaugeVec(
+	prometheus.GaugeOpts{
+		Name: "model_memory_usage_bytes",
+		Help: "memory usage for an ML deployment",
+	},
+	[]string{"namespace","type","name"},
+)
+
+var modelContainersMetric = prometheus.NewGaugeVec(
+	prometheus.GaugeOpts{
+		Name: "model_containers_average",
+		Help: "Average running containers for an ML deployment",
+	},
+	[]string{"namespace","type","name"},
+)
 
 func init() {
 	//Register metrics with prometheus
-	prometheus.MustRegister(fooMetric)
-	prometheus.MustRegister(barMetric)
+	prometheus.MustRegister(modelCpuUsageMetric)
+	prometheus.MustRegister(modelMemoryUsageMetric)
+	prometheus.MustRegister(modelContainersMetric)
 
-	//Set fooMetric to 1
-	fooMetric.Set(0)
+	modelCpuUsageMetric.WithLabelValues("seldon-ns","SeldonDeployment","iris").Set(0.019797927555476498)
 
-	//Set barMetric to 0
-	barMetric.Set(1)
+	modelMemoryUsageMetric.WithLabelValues("seldon-ns","SeldonDeployment","iris").Set(138986.313)
+
+	modelContainersMetric.WithLabelValues("seldon-ns","SeldonDeployment","iris").Set(2.1)
+
+	//TODO: need to set metrics periodically
+	//and reset on each iteraction with modelContainersMetric.Reset()
 }

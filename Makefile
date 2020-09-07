@@ -15,3 +15,6 @@ docker-push:
 
 helm-install:
 	helm upgrade seldon-prometheus-exporter ./helm/seldon-prometheus-exporter --namespace=seldon-system --install
+
+helm-delete:
+	helm delete seldon-prometheus-exporter --namespace=seldon-system

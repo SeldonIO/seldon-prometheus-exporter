@@ -19,6 +19,10 @@ model_memory_usage_bytes{namespace="seldon",type="seldon",name="iris"} 138986.31
 model_containers_average{namespace="seldon",type="seldon",name="income"} 1.15
 model_cpu_usage_seconds_total{namespace="seldon",type="seldon",name="income"} 0.028586977665586328
 model_memory_usage_bytes{namespace="seldon",type="seldon",name="income"} 235434.334
+model_cpu_requests{name="income",namespace="seldon",type="SeldonDeployment"} 1.1
+model_cpu_limits{name="income",namespace="seldon",type="SeldonDeployment"} 1
+model_memory_requests_bytes{name="income-default",namespace="seldon",type="SeldonDeployment"} 1.073741824e+09
+model_memory_limits_bytes{name="income-default",namespace="seldon",type="SeldonDeployment"} 1.073741824e+09
 ```
 
 These are based on [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics/blob/e43aaa6d6e3554d050ead73b4814566b771377d1/docs/pod-metrics.md) that provide the data as a basis.
@@ -29,7 +33,13 @@ The query frequency needs to be configured. This needs to be configured both on 
 
 The exporter is both scraped by prometheus and reads from prometheus. It needs configuration for both.
 
-THIS IS A TODO - WIP
+Data refresh frequency is set with `TIME_PERIOD`. Format is a prom time period.
+
+The prometheus to gather data from is set with `PROMETHEUS_URL`.
+
+If a token is needed then set in `PROMETHEUS_SELDON_TOKEN`.
+
+TODO: scrape config for analytics
 
 # How to Run
 

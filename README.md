@@ -51,7 +51,7 @@ Then `go run ./.`
 
 Go to `http://localhost:8000/metrics` to see metrics.
 
-There will be a k8s install. It's WIP.
+Or use WIP helm chart with `make helm-install`
 
 ## Notes
 

@@ -21,12 +21,27 @@ model_cpu_usage_seconds_total{namespace="seldon",type="seldon",name="income"} 0.
 model_memory_usage_bytes{namespace="seldon",type="seldon",name="income"} 235434.334
 ```
 
+These are based on [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics/blob/e43aaa6d6e3554d050ead73b4814566b771377d1/docs/pod-metrics.md) that provide the data as a basis.
 
 ## Configuration
 
 The query frequency needs to be configured. This needs to be configured both on the internal querying frequency and with the same frequency on scraping of the exporter.
 
 The exporter is both scraped by prometheus and reads from prometheus. It needs configuration for both.
+
+THIS IS A TODO - WIP
+
+# How to Run
+
+First port-forward to a prometheus in a cluster running Seldon. 
+```
+kubectl port-forward -n seldon-system svc/seldon-core-analytics-prometheus-seldon 8080:80
+```
+Then `go run ./.`
+
+Go to `http://localhost:8000/metrics` to see metrics.
+
+There will be a k8s install. It's WIP.
 
 ## Notes
 

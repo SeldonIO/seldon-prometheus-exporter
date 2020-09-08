@@ -32,7 +32,7 @@ serviceAccount:
 
 podAnnotations:
   prometheus.io/path: /metrics
-  prometheus.io/scrape: "true"
+  prometheus.io/scrape.slow: "true"
 
 podSecurityContext: {}
   # fsGroup: 2000

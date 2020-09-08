@@ -39,6 +39,8 @@ The prometheus to gather data from is set with `PROMETHEUS_URL`.
 
 If a token is needed then set in `PROMETHEUS_SELDON_TOKEN`.
 
+These are also exposed in the helm chart values file.
+
 TODO: scrape config for analytics
 
 # How to Run
@@ -51,7 +53,7 @@ Then `go run ./.`
 
 Go to `http://localhost:8000/metrics` to see metrics.
 
-Or use WIP helm chart with `make helm-install`
+Or use helm chart with `make helm-install`
 
 ## Notes
 

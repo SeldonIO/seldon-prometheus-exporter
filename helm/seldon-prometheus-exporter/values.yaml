@@ -19,6 +19,8 @@ prometheus:
   #jwtSecretName: "jwt-elastic"
   #jwtSecretKey: "jwt-elastic.txt"
 
+timePeriod: "3m"
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true

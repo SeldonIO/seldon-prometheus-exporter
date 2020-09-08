@@ -42,6 +42,10 @@ spec:
             - name: "PROMETHEUS_URL"
               value: "{{ .Values.prometheus.url }}"
             {{- end}}
+            {{- if .Values.timePeriod }}
+            - name: "TIME_PERIOD"
+              value: "{{ .Values.timePeriod }}"
+            {{- end}}
             {{- if .Values.prometheus.jwtSecretName }}
             - name: "PROMETHEUS_SELDON_TOKEN"
               valueFrom:

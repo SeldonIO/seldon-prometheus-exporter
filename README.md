@@ -41,7 +41,7 @@ If a token is needed then set in `PROMETHEUS_SELDON_TOKEN`.
 
 These are also exposed in the helm chart values file.
 
-TODO: scrape config for analytics
+The chart exposes a metrics port and adds annotations for scraping by seldon core analytics.
 
 # How to Run
 

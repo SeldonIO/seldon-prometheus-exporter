@@ -14,7 +14,7 @@ docker-push:
 	docker push ${IMG}
 
 helm-install:
-	helm upgrade seldon-prometheus-exporter ./helm/seldon-prometheus-exporter --namespace=seldon-system --install
+	helm upgrade seldon-prometheus-exporter ./helm/seldon-prometheus-exporter --namespace=seldon-system --install --recreate-pods
 
 helm-delete:
 	helm delete seldon-prometheus-exporter --namespace=seldon-system

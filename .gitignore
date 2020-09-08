@@ -1,2 +1,3 @@
 .idea
 seldon-prometheus-exporter
+!helm/seldon-prometheus-exporter

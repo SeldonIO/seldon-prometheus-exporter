@@ -27,7 +27,7 @@ type MetricInstance struct {
 }
 
 var DefaultInputData = 	QueryInputData{
-Range: `1d`,
+Range: `2m`,
 OffsetExp: ``,
 }
 

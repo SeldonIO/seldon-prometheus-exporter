@@ -107,7 +107,16 @@ func init() {
 }
 
 func collectMetricsUsingQueryTemplate(metric *prometheus.GaugeVec, queryTemplate string) {
-	queryReturnValues, err := query.ObtainMetricValues(queryTemplate, query.DefaultInputData)
+
+	timePeriod := os.Getenv("TIME_PERIOD")
+	if timePeriod == "" {
+		timePeriod = "2m"
+	}
+
+	var inputData = query.DefaultInputData
+	inputData.Range = timePeriod
+
+	queryReturnValues, err := query.ObtainMetricValues(queryTemplate, inputData)
 	if err != nil {
 		log.Println(err)
 	}

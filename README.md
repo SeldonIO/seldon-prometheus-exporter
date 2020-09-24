@@ -1,5 +1,7 @@
 # Seldon Prometheus Exporter
 
+# ARCHIVING THIS PROJECT AS USING https://github.com/SeldonIO/seldon-core/pull/2484 INSTEAD
+
 This exporter should lookup kube-state-metrics for models and downsample relevant metrics to be exported at collected again.
 
 ## How it Works
